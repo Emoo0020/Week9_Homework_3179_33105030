@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Life Expectancy by SA4 (Australia)</title>
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+<body>
+  <h1>Life Expectancy in Australia by SA4 Region (2021–2023)</h1>
+  <div id="vis"></div>
+
+  <script type="text/javascript">
+    var spec = {
+      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+      "width": 800,
+      "height": 600,
+      "projection": {"type": "mercator"},
+      "layer": [
+        {
+          "data": {
+            "url": "SA4_2021_AUST_GDA2020.json",
+            "format": {"type": "topojson", "feature": "sa4_2021_simplified"}
+          },
+          "mark": {"type": "geoshape", "fill": "lightgray", "stroke": "white"}
+        },
+        {
+          "data": {
+            "url": "life_expectancy_sa4.csv"
+          },
+          "transform": [
+            {
+              "lookup": "SA4_NAME21",
+              "from": {
+                "data": {
+                  "url": "SA4_2021_AUST_GDA2020.json",
+                  "format": {"type": "topojson", "feature": "sa4_2021_simplified"}
+                },
+                "key": "properties.SA4_NAME21"
+              },
+              "as": "geo"
+            }
+          ],
+          "mark": {"type": "geoshape"},
+          "encoding": {
+            "shape": {"field": "geo", "type": "geojson"},
+            "color": {
+              "field": "life_expectancy",
+              "type": "quantitative",
+              "scale": {"scheme": "blues"}
+              "legend": { "title": "Years" }
+            },
+            "tooltip": [
+              {"field": "SA4_NAME21", "type": "nominal", "title": "Region"},
+              {"field": "life_expectancy", "type": "quantitative", "title": "Life Expectancy"}
+            ]
+          }
+        }
+      ]
+    };
+
+    vegaEmbed("#vis", spec).then(console.log).catch(console.warn);
+  </script>
+</body>
+</html>
